@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'lecturers.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center mt-4">Professors</h1>
+                <form class="search-container mt-4 d-flex align-items-center" action="{% url 'search_lecturer' %}" method="GET">
+                    <input name="q" type="text" class="form-control w-100" placeholder="Search for Lecturer (Enter Name)" value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-secondary mx-2">Search</button>
+                    {% if request.GET.q %}
+                    <a href="{% url 'lecturers' %}" class="btn btn-danger">Clear</a>
+                    {% endif %}
+                    {% comment %} if admin user {% endcomment %}
+                    {% if user.is_superuser %}
+                    <button type="button" class="btn btn-primary my-4" data-toggle="modal" data-target="#exampleModalCenter" style="width: 150px">Add Lecturer</button>
+                    {% endif %}
+                </form>
+                {% if lecturers %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Professor ID</th>
+                                <th scope="col">Professor Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">Professor Gender</th>
+                                <th scope="col">Past Courses Taught</th>
+                                {% comment %} <th scope="col">Rating</th> {% endcomment %}
+                                {% if user.is_superuser %}
+                                <th scope="col">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lecturer in lecturers %}
+                                <tr>
+                                    <td>{{ lecturer.id }}</td>
+                                    <td>{{ lecturer.lecturer_name }}</td>
+                                    <td>{{ lecturer.lecturer_email }}</td>
+                                    <td>{{ lecturer.lecturer_department.department_name }}</td>
+                                    <td>
+                                        {% if lecturer.lecturer_gender == 'M' %}
+                                        Male
+                                        {% else %}
+                                        Female
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% for course in lecturer.lecturer_past_courses.all %}
+                                            {{ course.course_name }}{% if not forloop.last %}, {% endif %}
+                                        {% empty %}
+                                            No past courses taught.
+                                        {% endfor %}
+                                    </td>
+                                    {% comment %} <td>{{ lecturer.lecturer_rating }}</td> {% endcomment %}
+                                    {% if user.is_superuser %}
+                                    <td class="d-flex">
+                                        <a href="{% url 'edit_lecturer' lecturer.id %}" class="btn btn-sm btn-primary mr-1">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/admin/pages/lecturer/{{ lecturer.id }}/delete/" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center">No professors found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    {% if user.is_superuser %}
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <form method="POST" action="{% url 'add_lecturer' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Professor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    {% comment %} <div class="form-group">
+                        <label for="user">User</label>
+                        <select required name="lecturer_user" class="form-control">
+                            <option value="">Choose</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div> {% endcomment %}
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select required name="lecturer_department" class="form-control">
+                            <option value="">Choose</option>
+                            {% for department in departments %}
+                                <option value="{{ department.id }}">{{ department.department_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Professor Name</label>
+                        <input required name="lecturer_name" type="text" class="form-control" id="name" placeholder="Enter Lecturer Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input required name="lecturer_email" type="email" class="form-control" id="email" placeholder="Enter Lecturer Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input required name="lecturer_phone" type="tel" class="form-control" id="phone" placeholder="Enter Lecturer Phone (ex. 05)">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select required name="lecturer_gender" class="form-control">
+                            <option value="">Choose</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+                    {% comment %} <div class="form-group">
+                        <label for="lecturer_type">Professor Type</label>
+                        <select  name="lecturer_type" class="form-control">
+                            <option value="">Choose</option>
+                            <option value="L">Laboratory</option>
+                            <option value="T">Theory</option>
+                        </select>
+                    </div> {% endcomment %}
+                    <div class="form-group">
+                        <label for="past_courses">Past Courses Taught (press ctrl+click will remove the selection)</label>
+                        <!-- multiselect -->
+                        <select  name="lecturer_past_courses" multiple class="form-control" id="past">
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.course_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // check if the modal id closed
+        $('#exampleModalCenter').on('hidden.bs.modal', function () {
+            // reset the form
+            $(this).find('form').trigger('reset');
+        })
+      </script>
+    {% endif %}
+{% endblock %}

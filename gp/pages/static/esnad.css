@@ -1,0 +1,41 @@
+.draggable {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: move;
+}
+
+.droppable {
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.droppable .assigned-lecturer {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.alert.alert-danger {
+    color: #155724;
+    background-color: rgb(146, 182, 146);
+    border-color: #c3e6cb;
+}
+.alert.alert-danger {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+.alert.alert-success {
+  background-color: rgb(146, 182, 146);
+  color: #155724;
+  border-color: #c3e6cb;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}

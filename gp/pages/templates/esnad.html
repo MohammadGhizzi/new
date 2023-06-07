@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'esnad.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger text-center mt-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="container">
+        <h3 class="mt-4 mb-4 text-center">Assign Professors to Courses</h3>
+        <table class="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Courses</th>
+                <th scope="col">Professor</th>
+                <th scope="col">Professor Type</th>
+                <th scope="col">Section</th>
+                <th scope="col">Day</th>
+                <th scope="col">Time</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for course in courses %}
+                <tr>
+                    <form action="{% url 'add_lecturer_to_course' course.id %}" method="POST">
+                    <td>{{ course.course_name }}
+                        {% if course.course_building == 'A' %}
+                            (Girls)
+                        {% else %}
+                            (Boys)
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% csrf_token %}
+                        {% comment %} onchange submit this form {% endcomment %}
+                        <select required name="lecturer" name="lecturer" class="form-control bg-white border-0" {% if not user.is_superuser %} disabled {% endif %}>
+                            <option value="" disabled hidden>Choose here</option>
+                        {% for lecturer in lecturers %}
+                            {% if lecturer == course.course_lecturer or lecturer == course.course_lab_lecturer %}
+                                <option value="{{ lecturer.id }}" selected>
+                                    {{ lecturer.lecturer_name }}
+                                    {% if user.is_superuser and lecturer in course.course_past_lecturers.all %}
+                                        <span style="font-size: 10px;">(Suggested)</span>
+                                    {% elif lecturer.lecturer_department == course.course_department %}
+                                        <span style="font-size: 10px;">(Suggested)</span>
+                                    {% endif %}
+                                </option>
+                            {% else %}
+                                <option value="{{ lecturer.id }}">
+                                    {{ lecturer.lecturer_name }}
+                                    {% if user.is_superuser and lecturer in course.course_past_lecturers.all %}
+                                        <span style="font-size: 10px;">(Suggested)</span>
+                                    {% elif lecturer.lecturer_department == course.course_department %}
+                                        <span style="font-size: 10px;">(Suggested)</span>
+                                    {% endif %}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select required name="lecturer_type" class="form-control bg-white border-0">
+                            <option value="">Choose Type</option>
+                            <option value="L" {% if course.course_lab_lecturer %} selected {% endif %}
+                            >Laboratory</option>
+                            <option value="T" {% if course.course_lecturer %} selected {% endif %}
+                            >Theory</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select required name="section" class="form-control bg-white border-0">
+                            <option value="">Choose Section</option>
+                                <option {% if course.course_section == '171' %} selected {% endif %} value="171">171</option>
+                                <option {% if course.course_section == '172' %} selected {% endif %} value="172">172</option>
+                                <option {% if course.course_section == '173' %} selected {% endif %} value="173">173</option>
+                                <option {% if course.course_section == '174' %} selected {% endif %} value="174">174</option>
+                                <option {% if course.course_section == '175' %} selected {% endif %} value="175">175</option>
+                                <option {% if course.course_section == '176' %} selected {% endif %} value="176">176</option>
+                                <option {% if course.course_section == '177' %} selected {% endif %} value="177">177</option>
+                                <option {% if course.course_section == '178' %} selected {% endif %} value="178">178</option>
+                                <option {% if course.course_section == '179' %} selected {% endif %} value="179">179</option>
+                                <option {% if course.course_section == '180' %} selected {% endif %} value="180">180</option>
+
+                                <option {% if course.course_section == '271' %} selected {% endif %} value="271">271</option>
+                                <option {% if course.course_section == '272' %} selected {% endif %} value="272">272</option>
+                                <option {% if course.course_section == '273' %} selected {% endif %} value="273">273</option>
+                                <option {% if course.course_section == '274' %} selected {% endif %} value="274">274</option>
+                                <option {% if course.course_section == '275' %} selected {% endif %} value="275">275</option>
+                                <option {% if course.course_section == '276' %} selected {% endif %} value="276">276</option>
+                                <option {% if course.course_section == '277' %} selected {% endif %} value="277">277</option>
+                                <option {% if course.course_section == '278' %} selected {% endif %} value="278">278</option>
+                                <option {% if course.course_section == '279' %} selected {% endif %} value="279">279</option>
+                                <option {% if course.course_section == '280' %} selected {% endif %} value="280">280</option>
+                            
+                            
+                        </select>
+                    </td>
+                    <td>
+                        <select required name="day"  class="form-control bg-white border-0">
+                            <option value="">Choose Day</option>
+                            <option {% if course.course_day == '1' %} selected {% endif %} value="1">Sunday</option>
+                            <option {% if course.course_day == '2' %} selected {% endif %} value="2">Monday</option>
+                            <option {% if course.course_day == '3' %} selected {% endif %} value="3">Tuesday</option>
+                            <option {% if course.course_day == '4' %} selected {% endif %} value="4">Wednesday</option>
+                            <option {% if course.course_day == '5' %} selected {% endif %} value="5">Thursday</option>
+                        </select>
+                    <td>
+                        <input required type="time" name="time" class="form-control bg-white border-0" value="{{ course.course_time|time:'H:i' }}">
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary" {% if not user.is_superuser %} disabled {% endif %}>Assign</button>
+                    </td>
+                </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+
+        <a href="{% url 'automate_esnad' %}" class="btn btn-primary" {% if not user.is_superuser %} disabled {% endif %}
+        >Automatically Assign</a>
+    </div>
+
+    {% comment %} <script src="{% static 'esnad.js' %}"></script> {% endcomment %}
+    
+{% endblock %}

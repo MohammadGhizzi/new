@@ -1,0 +1,70 @@
+/* header-footer.css */
+
+/* HEADER STYLES */
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 20%;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+.logo-left img, .logo-right img, .navbar-brand img {
+    height: 100%;
+}
+
+nav {
+    flex: 1;
+    margin-left: 50px;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    margin-left: 20px;
+}
+
+nav a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #00f;
+}
+
+/* FOOTER STYLES */
+footer {
+    background-color: #888;
+    color: #fff;
+    padding: 20px 0;
+    width: 100%;
+    text-align: right;
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-container {
+    flex-grow: 1;
+}

@@ -1,0 +1,107 @@
+/* courses.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    text-align: left;
+    padding: 8px;
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #e6e6e6;
+}
+
+.nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.nav a {
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    color: #333;
+    margin-right: 10px;
+}
+
+.nav a:hover {
+    background-color: #e6e6e6;
+}
+
+.nav a.active {
+    background-color: #ccc;
+}
+
+@media (max-width: 768px) {
+    table,
+    table thead,
+    table tbody,
+    table th,
+    table td,
+    table tr {
+        display: block;
+    }
+
+    table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    table tr {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    table td {
+        border: none;
+        border-bottom: 1px solid #ccc;
+        position: relative;
+        padding-left: 50%;
+    }
+
+    table td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+        font-weight: bold;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}

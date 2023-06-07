@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="">
+    <div class="mt-5 p-5">
+        <div class="container">
+            <h3 class="mt-4 mb-4 text-center">Welcome, <b>{{lecturer.lecturer_name}}</b></h3>
+            <h6>Here are the courses that are assigned to you:</h6>
+            <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">Courses Code</th>
+                    <th scope="col">Courses Name</th>
+                    <th scope="col">Courses Type</th>
+                    <th scope="col">Building</th>
+                    <th scope="col">Section</th>
+                    <th scope="col">Past Professors</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{course.course_code}}</td>
+                        <td>{{course.course_name}}</td>
+                        <td>
+                            {% if course.course_lab_lecturer %}
+                                Laboratory
+                            {% else %}
+                                Theory
+                            {% endif %}
+                        </td>
+                        <td>{{course.course_building}}</td>
+                        <td>{{course.course_section}}</td>
+                        <td>
+                            {% for lecturer in course.course_past_lecturers.all %}
+                                {{ lecturer.lecturer_name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                None
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if similar_lecturers %}
+            <h6 class="mt-4">Here are the professors with the courses you teach:</h6>
+            <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">Professor Name</th>
+                    <th scope="col">Professor Email</th>
+                    <th scope="col">Professor Phone</th>
+                    <th scope="col">Past Courses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lecturer in similar_lecturers %}
+                    <tr>
+                        <td>{{lecturer.lecturer_name}}</td>
+                        <td>{{lecturer.lecturer_email}}</td>
+                        <td>{{lecturer.lecturer_phone}}</td>
+                        <td>
+                            {% for course in lecturer.lecturer_past_courses.all %}
+                                {{ course.course_name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                None
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <h6 class="mt-4 text-secondary">There are no professors with the courses you teach.</h6>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+    
+{% endblock %}

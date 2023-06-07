@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <head>
+        <link rel="stylesheet" href="{% static 'courses.css' %}">
+    </head>
+    <div class="container">
+        <h1 class="text-center mt-4">Courses</h1>
+        <form class="search-container mt-4 d-flex" action="{% url 'search_course' %}" method="GET">
+            <input name="q" type="text" class="form-control w-100" placeholder="Search for courses (Enter Course Code or Course Name)" value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-secondary ml-2">Search</button>
+            {% if request.GET.q %}
+                <a href="{% url 'courses' %}" class="btn btn-secondary ml-2">Clear</a>
+            {% endif %}
+            {% comment %} if admin user {% endcomment %}
+            {% if user.is_superuser %}
+                <button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#exampleModalCenter" style="width: 150px">Add Course</button>
+            {% endif %}
+        </form>
+        {% if courses %}
+        <table class="table table-bordered mt-4" id="course-table">
+            <thead>
+                    <tr>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_department">Department</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_code">Course Code</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_name">Course Name</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="credit_hours">Credit Hours</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_lecturer">Professor</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_level">Course Level</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_lab_lecturer">Lab Professor</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_past_lecturers">Past Professor</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_building">Building</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="order-by" data-field="course_section">Section</a>
+                        </th>
+                        {% if user.is_superuser %}
+                            <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.course_department.department_name }}</td>
+                        <td>{{ course.course_code }}</td>
+                        <td>{{ course.course_name }}</td>
+                        <td>{{ course.credit_hours }}</td>
+                        <td>{{ course.course_lecturer.lecturer_name }}</td>
+                        <td>{{ course.course_level }}</td>
+                        <td>{{ course.course_lab_lecturer.lecturer_name }}</td>
+                        <td>
+                            {% for lecturer in course.course_past_lecturers.all %}
+                                {{ lecturer.lecturer_name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                None
+                            {% endfor %}
+                        </td>
+                        <td>{{ course.course_building }}</td>
+                        <td>{{ course.course_section }}</td>
+                        {% if user.is_superuser %}
+                            <td class="d-flex">
+                                {% comment %} go to admin panel {% endcomment %}
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-primary mr-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="/admin/pages/course/{{ course.id }}/delete/" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{% url 'duplicate_courses' %}" class="btn btn-primary" {% if not user.is_superuser %} disabled {% endif %} onclick="return confirm('Are you sure you want to duplicate all courses?');">Duplicate Courses</a>
+        {% else %}
+            <p class="text-center mt-4">No courses found.</p>
+        {% endif %}
+    </div>
+
+
+    {% if user.is_superuser %}
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <form method="POST" action="{% url 'add_course' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Course</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="department">Department *</label>
+                        <select required name="course_department" class="form-control" id="department">
+                            <option value="">Choose Department</option>
+                            {% for department in departments %}
+                                <option value="{{ department.id }}">{{ department.department_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Course Name *</label>
+                        <input required name="course_name" type="text" class="form-control" id="name" placeholder="Enter Course Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Course Code *</label>
+                        <input required name="course_code" type="text" class="form-control" id="code" placeholder="Enter Course Code">
+                    </div>
+                    <div class="form-group">
+                        <label for="credit">Credit Hours *</label>
+                        <input required name="credit_hours" type="number" class="form-control" id="credit" placeholder="Enter Credit Hours" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="level">Course Level *</label>
+                        <input required name="course_level" type="number" class="form-control" id="level" placeholder="Enter Course Level" min="1" max="13">
+                    </div>
+                    <div class="form-group">
+                        <label for="lecturer">Professor *</label>
+                        <select  name="course_lecturer" class="form-control" id="lecturer">
+                            <option value="">Choose Professor</option>
+                            {% for lecturer in lecturers %}
+                                <option value="{{ lecturer.id }}">{{ lecturer.lecturer_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lab">Co-Professor *</label>
+                        <select  name="course_lab_lecturer" class="form-control" id="lab">
+                            <option value="">Choose Co-Professor</option>
+                            {% for lecturer in lecturers %}
+                                <option value="{{ lecturer.id }}">{{ lecturer.lecturer_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="past">Prerequisites * (press ctrl+click will remove the selection)</label>
+                        <!-- multiselect -->
+                        <select  name="course_past_lecturers" multiple class="form-control" id="past">
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.course_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="building">Building</label>
+                        <select required name="course_building" class="form-control" id="building">
+                            <option value="">Choose Building</option>
+                            <option value="A">A (Girls)</option>
+                            <option value="B">B (Boys)</option>
+                        </select>
+                    </div> 
+                    {% comment %} <div class="form-group">
+                        <label for="section">Section</label>
+                        <input name="course_section" type="text" class="form-control" id="section" placeholder="Enter Section">
+                    </div> {% endcomment %}
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save </button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="{% static 'tablesorter/jquery.tablesorter.min.js' %}"></script>
+      <script>
+        // JavaScript code to handle table column ordering
+        $(document).ready(function () {
+          // Handle click event on table headers with 'order-by' class
+          $('.order-by').click(function (e) {
+            e.preventDefault();
+            const field = $(this).data('field');
+            const currentUrl = new URL(window.location.href);
+            const currentOrder = currentUrl.searchParams.get('order');
+            let newOrder;
+      
+            if (currentOrder === field) {
+              newOrder = `-${field}`;
+            } else if (currentOrder === `-${field}`) {
+              newOrder = field;
+            } else {
+              newOrder = field;
+            }
+      
+            currentUrl.searchParams.set('order', newOrder);
+            const newUrl = currentUrl.toString();
+      
+            // Update the href attribute of the clicked anchor element
+            $(this).attr('href', newUrl);
+      
+            // Uncomment the line below if you want to navigate to the new URL immediately
+            // window.location.href = newUrl;
+          });
+      
+          // Initialize the TableSorter plugin on the table
+          $('#course-table').tablesorter();
+        });
+      </script>
+      
+      
+      
+    {% endif %}
+{% endblock %}

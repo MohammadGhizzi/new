@@ -1,0 +1,80 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'headfoot.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Imam Muhammed Ibn Saud Islamic University</title>
+</head>
+<body>
+    <header class="bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand pt-2" href="{% url 'landing' %}">
+                <img src="{% static 'images/ccis.png' %}" style="height: 55px; margin-top: -8px;" class="d-inline-block align-top" alt="">
+                <span>Esnad System</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% if user.is_authenticated %}
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        {% if user.is_superuser %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'courses' %}">Courses</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'lecturers' %}">Lecturers</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'assigned_courses' %}">Assigned</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'esnad' %}">Esnad</a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'exam_dates' %}">Exam Dates</a>
+                            </li>
+                            {% comment %} check if user is in Lecturers group {% endcomment %}
+                        {% elif get_user_groups %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'exam_dates' %}">Exam Dates</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                Welcome, {{ user.username }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% if user.is_superuser %}
+                                <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+                                {% endif %}
+                                {% comment %} <a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a> {% endcomment %}
+                                {% comment %} <div class="dropdown-divider"></div> {% endcomment %}
+                                <a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-sm btn-secondary px-4 text-white" href="{% url 'login' %}">Log In</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+        </nav>
+    </header>
+</body>
+</html>

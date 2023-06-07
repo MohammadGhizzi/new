@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center">
+    <div class="mt-5 card p-5" style="width: 100%; max-width: 700px">
+        <h3>
+            Edit Professor: {{ lecturer.lecturer_name }}
+        </h3>
+        <form method="POST" action="{% url 'edit_lecturer' lecturer.id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select required name="lecturer_department" class="form-control">
+                        <option value="">Choose</option>
+                        {% for department in departments %}
+                            <option value="{{ department.id }}" {% if department.id == lecturer.lecturer_department.id %} selected {% endif %}>{{ department.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input required name="lecturer_name" type="text" class="form-control" id="name" placeholder="Enter Lecturer Name" value="{{ lecturer.lecturer_name }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input required name="lecturer_email" type="email" class="form-control" id="email" placeholder="Enter Lecturer Email" value="{{ lecturer.lecturer_email }}">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input required name="lecturer_phone" type="tel" class="form-control" id="phone" placeholder="Enter Lecturer Phone" value="{{ lecturer.lecturer_number }}">
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select required name="lecturer_gender" class="form-control" value="{{lecturer.lecturer_gender}}">
+                        <option value="">Choose</option>
+                        <option value="M" {% if lecturer.lecturer_gender == 'M' %} selected {% endif %}
+                        >Male</option>
+                        <option value="F" {% if lecturer.lecturer_gender == 'F' %} selected {% endif %}
+                        >Female</option>
+                    </select>
+                </div>
+                {% comment %} <div class="form-group">
+                    <label for="lecturer_type">Professor Type</label>
+                    <select name="lecturer_type" class="form-control" value="{{lecturer.lecturer_type}}">
+                        <option value="">Choose</option>
+                        <option value="L" {% if lecturer.lecturer_type == 'L' %} selected {% endif %}>Lecturer</option>
+                        <option value="T" {% if lecturer.lecturer_type == 'T' %} selected {% endif %}>Theory</option>
+                    </select>
+                </div> {% endcomment %}
+                <div class="form-group">
+                    <label for="past_courses">Past Courses Taught</label>
+                    <!-- multiselect -->
+                    <select name="lecturer_past_courses" multiple class="form-control" id="past">
+                        {% for course in courses %}
+                            <option value="{{ course.id }}" {% if course in lecturer.lecturer_past_courses.all %} selected {% endif %}>{{ course.course_name }}</option>
+                            >{{ course.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <a href="{% url 'lecturers' %}" class="btn btn-secondary" >Cancel</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

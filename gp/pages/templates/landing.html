@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <head>
+    <link rel="stylesheet" href="{% static 'landing.css' %}">
+    </head>
+    
+    <main>
+        <div class="banner">
+            <img src="{% static 'images/banner.jpg' %}">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mt-4">
+                    <h2>Latest News</h2>
+                </div>
+            </div>
+            <div class="row">
+                {% for event in events %}
+                <div class="col-md-4 mt-4">
+                    <div class="card">
+                        <img class="card-img-top" src="{% static 'images/BackGround.jpg' %}" alt="Demo News Image 1">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">
+                                    {{ event.event_name }}
+                                </h5>
+                                <div>
+                                    {% comment %} edit {% endcomment %}
+                                    <a href="/admin/pages/event/{{event.id}}/change/">
+                                    <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <p class="card-text">
+                                {{ event.event_description }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,32 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+.fc-theme-standard .fc-bg {
+    background-color: #f2f2f2;
+}
+
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 40px;
+    height: calc(100% - 200px);
+    overflow-y: auto;
+}
+
+/* Add this block to set a maximum width and center the calendar */
+.fc {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100%;
+}

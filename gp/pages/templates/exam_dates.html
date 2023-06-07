@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link href="https://fullcalendar.io/js/fullcalendar-3.1.0/fullcalendar.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger text-center mt-2">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="container mb-5">
+    <h1 class="my-4 text-center">Exam Dates</h1>
+    <div class="d-flex justify-content-center">
+        <div id="calendar" style="max-width: 800px;"></div>
+    </div>
+    {% if user.is_superuser %}
+    <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-end" style="max-width: 800px;">
+            <button class="btn btn-primary mt-3 mr-2" data-toggle="modal" data-target="#addExamModalSingle">Add Exam (Single)</button>
+            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addExamModal">Add Exam (Automate)</button>
+        </div>
+    </div>
+    {% else %}
+    <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-end" style="max-width: 800px;">
+            <button class="btn btn-primary mt-3 mr-2" data-toggle="modal" data-target="#addExamModalSingleC">Add Quiz Exam</button>
+            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addExamModalC">Add Midterm Exam</button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if user.is_superuser %}
+<!-- Add Exam Modal -->
+<div class="modal fade" id="addExamModalSingle" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form method="POST" action="{% url 'add_exam_single' %}">
+            {% csrf_token %}
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add Exam</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+                <label for="examName">Course</label>
+                <select name="course" class="form-control" id="examName">
+                    <option selected disabled>Select Course</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="examDate1">Start Date</label>
+                <input name="start_date" type="date" class="form-control" id="examDate1" placeholder="Exam Date">
+            </div>
+            <div class="form-group">
+                <label for="examDate2">Start Time</label>
+                <input name="start_time" type="time" class="form-control" id="examDate2" placeholder="Exam Date">
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save </button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<div class="modal fade" id="addExamModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form method="POST" action="{% url 'add_exam' %}">
+            {% csrf_token %}
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add Exam</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="past_courses">Courses (select multiple)</label>
+                    <!-- multiselect -->
+                    <select name="courses" multiple class="form-control" id="past">
+                        {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            <div class="form-group">
+                <label for="examDate1">Start Date</label>
+                <input required name="start_date" type="date" class="form-control" id="examDate1">
+            </div>
+            <div class="form-group">
+                <label for="examDate3">End Date</label>
+                <input required name="end_date" type="date" class="form-control" id="examDate3">
+            </div>
+            <div class="form-group">
+                <label for="examDate2">Start Time</label>
+                <input name="start_time" type="time" class="form-control" id="examDate2" value="08:00">
+            </div>
+            <div class="form-group">
+                <label for="examDate4">End Time</label>
+                <input name="end_time" type="time" class="form-control" id="examDate4" value="16:00">
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save </button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{% else %}
+
+<div class="modal fade" id="addExamModalSingleC" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form method="POST" action="{% url 'add_quiz_exam' %}">
+            {% csrf_token %}
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add Quiz Exam</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+                <label for="examName">Course</label>
+                <select name="course" class="form-control" id="examName">
+                    <option selected disabled>Select Course</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="examDate1">Start Date</label>
+                <input name="start_date" type="date" class="form-control" id="examDate1" placeholder="Exam Date">
+            </div>
+            <div class="form-group">
+                <label for="examDate2">Start Time</label>
+                <input name="start_time" type="time" class="form-control" id="examDate2" placeholder="Exam Date">
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save </button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<div class="modal fade" id="addExamModalC" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form method="POST" action="{% url 'add_midterm_exam' %}">
+            {% csrf_token %}
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add Midterm Exam</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="past_courses">Courses (select multiple)</label>
+                    <!-- multiselect -->
+                    <select name="courses" multiple class="form-control" id="past">
+                        {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            <div class="form-group">
+                <label for="examDate1">Start Date</label>
+                <input required name="start_date" type="date" class="form-control" id="examDate1">
+            </div>
+            <div class="form-group">
+                <label for="examDate3">End Date</label>
+                <input required name="end_date" type="date" class="form-control" id="examDate3">
+            </div>
+            <div class="form-group">
+                <label for="examDate2">Start Time</label>
+                <input name="start_time" type="time" class="form-control" id="examDate2" value="08:00">
+            </div>
+            <div class="form-group">
+                <label for="examDate4">End Time</label>
+                <input name="end_time" type="time" class="form-control" id="examDate4" value="16:00">
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save </button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://fullcalendar.io/js/fullcalendar-3.1.0/lib/moment.min.js"></script>
+<script src="https://fullcalendar.io/js/fullcalendar-3.1.0/fullcalendar.min.js"></script>
+<script>
+
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+        events: {{ exam_dates|safe }},
+    });
+});
+
+
+</script>
+{% endblock %}
